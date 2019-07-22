@@ -42,7 +42,7 @@ public class ControllerDiagramISX : GamepadISX
     {
         // Rule out Keyboard and Mouse input
         string device = control.device.description.deviceClass;
-        if (device == "Keyboard" || device == "Mouse")
+        if (device == "Keyboard" || device == "Mouse" || device == "Pen")
             return;
 
         OnControllerButtonPress(control);

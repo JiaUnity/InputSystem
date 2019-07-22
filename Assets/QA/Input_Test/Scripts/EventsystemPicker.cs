@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -8,42 +6,41 @@ using UnityEngine.InputSystem.UI;
 
 public class EventsystemPicker : MonoBehaviour
 {
+    [Header("Event Systems")]
     public StandaloneInputModule m_oldSystem;
     public InputSystemUIInputModule m_newSystem;
 
-    private IEnumerable<Toggle> m_toggles;
+    [Header("Toggles")]
+    public Toggle m_oldToggle;
+    public Toggle m_newToggles;    
+        
 
     // Start is called before the first frame update
     void Start()
     {
-        m_toggles = GetComponent<ToggleGroup>().ActiveToggles();
-        foreach (Toggle toggle in m_toggles)
+        m_oldToggle.onValueChanged.AddListener(delegate { OnToggleChanged(); });
+        m_newToggles.isOn = true;
+    }
+
+    void Update()
+    {
+        // Only Shortcut for New ISX
+        Keyboard currentKeyboard = InputSystem.GetDevice<Keyboard>();
+        if (currentKeyboard != null && currentKeyboard.tabKey.isPressed)
         {
-            toggle.onValueChanged.AddListener(delegate {
-                OnToggleChanged();
-            });
-            if (toggle.gameObject.name == "New")
-                toggle.isOn = true;
-        }
+            if (currentKeyboard.tabKey.wasPressedThisFrame)
+            {
+                if (m_oldToggle.isOn)
+                    m_newToggles.isOn = true;
+                else
+                    m_oldToggle.isOn = true;
+            }            
+        }            
     }
 
     public void OnToggleChanged()
     {
-        foreach (Toggle toggle in m_toggles)
-        {
-            if (toggle.isOn)
-            {
-                if (toggle.gameObject.name == "Old")
-                {
-                    m_newSystem.enabled = false;
-                    m_oldSystem.enabled = true;
-                }
-                else
-                {
-                    m_oldSystem.enabled = false;
-                    m_newSystem.enabled = true;
-                }
-            }
-        }
+        m_oldSystem.enabled = m_oldToggle.isOn;
+        m_newSystem.enabled = m_newToggles.isOn;        
     }
 }

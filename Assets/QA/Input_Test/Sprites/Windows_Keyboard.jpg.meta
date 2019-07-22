@@ -41,6 +41,9 @@ TextureImporter:
   - first:
       213: -6965672402992529433
     second: Windows_Keyboard_=
+  - first:
+      213: -5426263828530482972
+    second: Windows_Keyboard_Space
   externalObjects: {}
   serializedVersion: 10
   mipmaps:
@@ -424,6 +427,27 @@ TextureImporter:
       bones: []
       spriteID: 1d9521d7f3c31e841a292463d90d6941
       internalID: -6965672402992529433
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Windows_Keyboard_Space
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 26
+        width: 269
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5c4f46b462a43fd4b86b29aac5fc00f7
+      internalID: -5426263828530482972
       vertices: []
       indices: 
       edges: []

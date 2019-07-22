@@ -124,7 +124,7 @@ public class PenISX : MonoBehaviour
                 m_outOfRangeSign.SetActive(control.ReadValue() == 0);
                 break;
 
-            case "button":
+            case "press":
                 break;
 
             default:

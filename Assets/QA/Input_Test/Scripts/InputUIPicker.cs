@@ -27,31 +27,44 @@ public class InputUIPicker : MonoBehaviour
 
     void Start()
     {
-        SwitchToKeyMouse();
+        if (Save.DeviceValue == 0 && Save.OtherValue == 0)
+            SwitchToKeyMouse();
+        else
+        {
+            SwitchToDeviceTest(Save.DeviceValue);
+            SwitchToOtherTest(Save.OtherValue);
+        }
     }
 
     void Update()
     {
-        // !!!!!TEMPORARY: Only Shortcut for Old Input Manager
+        // Only Shortcut for New ISX
         if (InputSystem.GetDevice<Keyboard>() == null) return;
 
         Keyboard currentKeyboard = InputSystem.GetDevice<Keyboard>();
         if (currentKeyboard.leftCtrlKey.isPressed || currentKeyboard.rightCtrlKey.isPressed)
         {
-            if (currentKeyboard.digit1Key.isPressed)
+            if (currentKeyboard.digit1Key.wasPressedThisFrame)
                 m_deviceDropdown.value = 1;
-            else if (currentKeyboard.digit2Key.isPressed)
+            else if (currentKeyboard.digit2Key.wasPressedThisFrame)
                 m_deviceDropdown.value = 2;
-            else if (currentKeyboard.digit3Key.isPressed)
+            else if (currentKeyboard.digit3Key.wasPressedThisFrame)
                 m_deviceDropdown.value = 3;
-            else if (currentKeyboard.digit4Key.isPressed)
+            else if (currentKeyboard.digit4Key.wasPressedThisFrame)
                 m_deviceDropdown.value = 4;
-            else if (currentKeyboard.digit5Key.isPressed)
+            else if (currentKeyboard.digit5Key.wasPressedThisFrame)
                 m_deviceDropdown.value = 5;
-            else if (currentKeyboard.digit6Key.isPressed)
+            else if (currentKeyboard.digit6Key.wasPressedThisFrame)
                 m_deviceDropdown.value = 6;
-            else if (currentKeyboard.digit7Key.isPressed)
+            else if (currentKeyboard.digit7Key.wasPressedThisFrame)
                 m_deviceDropdown.value = 7;
+        }
+        if (currentKeyboard.leftShiftKey.isPressed || currentKeyboard.rightShiftKey.isPressed)
+        {
+            if (currentKeyboard.digit1Key.wasPressedThisFrame)
+                m_otherDropdown.value = 1;
+            else if (currentKeyboard.digit2Key.wasPressedThisFrame)
+                m_otherDropdown.value = 2;
         }
     }
 
@@ -84,6 +97,7 @@ public class InputUIPicker : MonoBehaviour
                 break;
         }
         m_otherDropdown.value = 0;
+        Save.DeviceValue = value;
     }
 
     public void SwitchToOtherTest(int value)
@@ -93,14 +107,13 @@ public class InputUIPicker : MonoBehaviour
         else if (value == 2)
             SwitchToTestObject(m_processors);
         m_deviceDropdown.value = 0;
+        Save.OtherValue = value;
     }
 
     private void SwitchToKeyMouse()
     {
-#if (UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX)
+#if (UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX || UNITY_IOS )
         SwitchToTestObject(m_macKeyboardMouse);
-#elif (UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_WSA)
-        SwitchToTestObject(m_windowsKeyboardMouse);
 #else
         SwitchToTestObject(m_windowsKeyboardMouse);
 #endif

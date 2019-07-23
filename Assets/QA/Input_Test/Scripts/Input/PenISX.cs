@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
-public class PenISX : MonoBehaviour
+public class PenISX : ControllerDiagramISX
 {
     [Tooltip("Highlight for Pen Input")]
     public ParticleSystem m_highlightPS;
@@ -16,9 +16,6 @@ public class PenISX : MonoBehaviour
     [Header("Info UI")]
     public TextMesh m_pressureText;
     public Text m_penInfoText;
-
-    [Tooltip("Where all the messages go")]
-    public InputField m_MessageWindow;
 
     private InputAction m_penButtonAction;
     private InputAction m_penVector2Action;
@@ -47,7 +44,7 @@ public class PenISX : MonoBehaviour
         m_rotateAdjust = pen_rotation.GetChild(0).localEulerAngles;
 
         m_penButtonAction = new InputAction(name: "PenButtonAction", InputActionType.PassThrough, binding: "<pen>/<button>");
-        m_penButtonAction.performed += callbackContext => ButtonPress(callbackContext.control as ButtonControl);
+        m_penButtonAction.performed += callbackContext => OnButtonPress(callbackContext.control as ButtonControl);
         m_penButtonAction.Enable();
 
         m_penVector2Action = new InputAction(name: "PenVectorAction", InputActionType.PassThrough, binding: "<pen>/<vector2>");
@@ -97,7 +94,7 @@ public class PenISX : MonoBehaviour
         m_outOfRangeSign.SetActive(!pen.inRange.isPressed);
     }
 
-    private void ButtonPress(ButtonControl control)
+    private void OnButtonPress(ButtonControl control)
     {
         switch (control.name)
         {
@@ -124,12 +121,13 @@ public class PenISX : MonoBehaviour
                 m_outOfRangeSign.SetActive(control.ReadValue() == 0);
                 break;
 
-            case "press":
-                break;
+            //case "press":
+            //    break;
 
             default:
-                string str = control.name + ((control.ReadValue() == 0) ? " released" : " pressed");
-                ShowMessage(str);
+                OnControllerButtonPress(control);
+                //string str = control.name + ((control.ReadValue() == 0) ? " released" : " pressed");
+                //ShowMessage(str);
                 break;
         }
     }
@@ -183,18 +181,18 @@ public class PenISX : MonoBehaviour
         m_isRotating = false;
     }
 
-    private string FirstLetterToUpper(string str)
-    {
-        if (String.IsNullOrEmpty(str))
-            return null;
-        else if (str.Length == 1)
-            return str.ToUpper();
-        else
-            return char.ToUpper(str[0]) + str.Substring(1);
-    }
+    //private string FirstLetterToUpper(string str)
+    //{
+    //    if (String.IsNullOrEmpty(str))
+    //        return null;
+    //    else if (str.Length == 1)
+    //        return str.ToUpper();
+    //    else
+    //        return char.ToUpper(str[0]) + str.Substring(1);
+    //}
 
-    private void ShowMessage(string msg)
-    {
-        m_MessageWindow.text += "<color=brown>" + msg + "</color>\n";
-    }
+    //private void ShowMessage(string msg)
+    //{
+    //    m_MessageWindow.text += "<color=brown>" + msg + "</color>\n";
+    //}
 }

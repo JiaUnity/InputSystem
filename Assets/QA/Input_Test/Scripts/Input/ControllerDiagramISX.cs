@@ -92,7 +92,7 @@ public class ControllerDiagramISX : GamepadISX
     }
 
     // When a input is used for the first time, remove all tranparency from it
-    private void FirstTimeUse(Transform controlTrans)
+    protected void FirstTimeUse(Transform controlTrans)
     {
         // Remove transparency from all the Sprite Renderers
         foreach (SpriteRenderer sr in controlTrans.GetComponentsInChildren<SpriteRenderer>())

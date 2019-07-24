@@ -121,13 +121,8 @@ public class PenISX : ControllerDiagramISX
                 m_outOfRangeSign.SetActive(control.ReadValue() == 0);
                 break;
 
-            //case "press":
-            //    break;
-
             default:
                 OnControllerButtonPress(control);
-                //string str = control.name + ((control.ReadValue() == 0) ? " released" : " pressed");
-                //ShowMessage(str);
                 break;
         }
     }
@@ -158,6 +153,24 @@ public class PenISX : ControllerDiagramISX
         }
     }
 
+    protected override Transform GetInputTransform(string inputName, bool isStick = false, string dpadName = null)
+    {
+        Transform input = m_buttonContainer.Find(inputName);
+        // First time use
+        if (input == null)
+        {
+            input = m_buttonContainer.Find("Button");
+            if (input == null)
+                ShowMessage(inputName);
+            else
+            {
+                input.name = inputName;
+                FirstTimeUse(input);                
+            }                
+        }
+        return input;
+    }
+
     private void StartRotatePen(int targetAngle)
     {
         if (Mathf.Abs(m_rotateAdjust.z - targetAngle) < 1)
@@ -180,19 +193,4 @@ public class PenISX : ControllerDiagramISX
         }
         m_isRotating = false;
     }
-
-    //private string FirstLetterToUpper(string str)
-    //{
-    //    if (String.IsNullOrEmpty(str))
-    //        return null;
-    //    else if (str.Length == 1)
-    //        return str.ToUpper();
-    //    else
-    //        return char.ToUpper(str[0]) + str.Substring(1);
-    //}
-
-    //private void ShowMessage(string msg)
-    //{
-    //    m_MessageWindow.text += "<color=brown>" + msg + "</color>\n";
-    //}
 }

@@ -20,7 +20,7 @@ public class TouchISX : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        m_touchAction = new InputAction(name: "TouchAction", binding: "<touchscreen>/touch*"); // Not using <touch> in order to not get primaryTouch, too.
+        m_touchAction = new InputAction(name: "TouchAction", InputActionType.PassThrough, binding: "<touchscreen>/touch*"); // Not using <touch> in order to not get primaryTouch, too.
         m_touchAction.performed += callbackContext => TouchInput(callbackContext.control as TouchControl);
         m_touchAction.canceled += callbackContext => EndTouchInput(callbackContext.control as TouchControl);
         m_touchAction.Enable();
@@ -41,19 +41,24 @@ public class TouchISX : MonoBehaviour
         Touchscreen touchscreen = Touchscreen.current;
         if (touchscreen != null && m_touchInfo != null)
         {
-            m_touchInfo.MaxISXCount = touchscreen.touches.Count;
+            int j = 0;
 
             for (int i = 0; i < touchscreen.touches.Count; i++)
             {
                 TouchControl touch = touchscreen.touches[i];
-                string touchInfo = touch.touchId.ReadValue() + "\n"
-                    + touch.phase.ReadValue().ToString() + "\n"
-                    + touch.position.ReadValue().ToString() + "\n"
-                    + touch.pressure.ReadValue().ToString() + "\n"
-                    + touch.radius.ReadValue().ToString() + "\n"
-                    + touch.delta.ReadValue().ToString();
-                m_touchInfo.AddNewInputInfo(touchInfo, i);
+                if (touch.isInProgress)
+                {
+                    string touchInfo = touch.touchId.ReadValue() + "\n"
+                                     + touch.phase.ReadValue().ToString() + "\n"
+                                     + touch.position.ReadValue().ToString() + "\n"
+                                     + touch.pressure.ReadValue().ToString() + "\n"
+                                     + touch.radius.ReadValue().ToString() + "\n"
+                                     + touch.delta.ReadValue().ToString();                    
+                    m_touchInfo.AddNewInputInfo(touchInfo, j);
+                    j++;
+                }                
             }
+            m_touchInfo.MaxISXCount = j;
         }
     }
 

@@ -10,7 +10,6 @@
   * [Use In Editor UI](UseInEditor.md)
   * [Debugging Input](Debugging.md)
   * [Testing Input](Testing.md)
-  * [Future](Future.md)
   * [Contributing](Contributing.md)
 
 * Reference
@@ -26,7 +25,7 @@
     * [Steam](Steam.md)
     * [XR](XR.md)
     * [Sensors](Sensors.md)
-    * [Haptics](Haptics.md) (e.g. rumble)
+    * [Haptics](Haptics.md)
     * [HID](HID.md)
   * [Architecture](Architecture.md)
     * [Actions](Actions.md)

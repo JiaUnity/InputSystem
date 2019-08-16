@@ -13,27 +13,40 @@ namespace UnityEngine.InputSystem.Controls
     [InputControlLayout(stateType = typeof(TouchState))]
     public class TouchControl : InputControl<TouchState>
     {
+        [InputControl]
         public TouchPressControl press { get; private set; }
 
         /// <summary>
         /// The ID of the touch contact as reported by the underlying system.
         /// </summary>
+        [InputControl]
         public IntegerControl touchId { get; private set; }
 
         /// <summary>
         /// Absolute position on the touch surface.
         /// </summary>
+        [InputControl]
         public Vector2Control position { get; private set; }
 
+        [InputControl]
         public Vector2Control delta { get; private set; }
+        [InputControl]
         public AxisControl pressure { get; private set; }
+        [InputControl]
         public Vector2Control radius { get; private set; }
+        [InputControl]
         public TouchPhaseControl phase { get; private set; }
+        [InputControl]
         public IntegerControl displayIndex { get; private set; }
+        [InputControl]
         public ButtonControl indirectTouch { get; private set; }
+        [InputControl]
         public ButtonControl tap { get; private set; }
+        [InputControl]
         public IntegerControl tapCount { get; private set; }
+        [InputControl]
         public DoubleControl startTime { get; private set; }
+        [InputControl]
         public Vector2Control startPosition { get; private set; }
 
         public bool isInProgress
@@ -56,28 +69,25 @@ namespace UnityEngine.InputSystem.Controls
             m_StateBlock.format = new FourCC('T', 'O', 'U', 'C');
         }
 
-        protected override void FinishSetup(InputDeviceBuilder builder)
+        protected override void FinishSetup()
         {
-            if (builder == null)
-                throw new System.ArgumentNullException(nameof(builder));
-
-            press = builder.GetControl<TouchPressControl>(this, "press");
-            touchId = builder.GetControl<IntegerControl>(this, "touchId");
-            position = builder.GetControl<Vector2Control>(this, "position");
-            delta = builder.GetControl<Vector2Control>(this, "delta");
-            pressure = builder.GetControl<AxisControl>(this, "pressure");
-            radius = builder.GetControl<Vector2Control>(this, "radius");
-            phase = builder.GetControl<TouchPhaseControl>(this, "phase");
-            displayIndex = builder.GetControl<IntegerControl>(this, "displayIndex");
-            indirectTouch = builder.GetControl<ButtonControl>(this, "indirectTouch");
-            tap = builder.GetControl<ButtonControl>(this, "tap");
-            tapCount = builder.GetControl<IntegerControl>(this, "tapCount");
-            startTime = builder.GetControl<DoubleControl>(this, "startTime");
-            startPosition = builder.GetControl<Vector2Control>(this, "startPosition");
+            press = GetChildControl<TouchPressControl>("press");
+            touchId = GetChildControl<IntegerControl>("touchId");
+            position = GetChildControl<Vector2Control>("position");
+            delta = GetChildControl<Vector2Control>("delta");
+            pressure = GetChildControl<AxisControl>("pressure");
+            radius = GetChildControl<Vector2Control>("radius");
+            phase = GetChildControl<TouchPhaseControl>("phase");
+            displayIndex = GetChildControl<IntegerControl>("displayIndex");
+            indirectTouch = GetChildControl<ButtonControl>("indirectTouch");
+            tap = GetChildControl<ButtonControl>("tap");
+            tapCount = GetChildControl<IntegerControl>("tapCount");
+            startTime = GetChildControl<DoubleControl>("startTime");
+            startPosition = GetChildControl<Vector2Control>("startPosition");
 
             ////TODO: throw if state layouts of the controls doesn't match TouchState
 
-            base.FinishSetup(builder);
+            base.FinishSetup();
         }
 
         public override unsafe TouchState ReadUnprocessedValueFromState(void* statePtr)

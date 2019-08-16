@@ -248,7 +248,7 @@ namespace UnityEngine.InputSystem.Editor
         private void RefreshControlTreeValues()
         {
             var updateTypeToShow = InputSystem.s_Manager.defaultUpdateType;
-            var currentUpdateType = InputState.currentUpdate;
+            var currentUpdateType = InputState.currentUpdateType;
 
             InputStateBuffers.SwitchTo(InputSystem.s_Manager.m_StateBuffers, updateTypeToShow);
             m_ControlTree.RefreshControlValues();
@@ -305,7 +305,7 @@ namespace UnityEngine.InputSystem.Editor
             }
         }
 
-        private void OnDeviceStateChange(InputDevice device)
+        private void OnDeviceStateChange(InputDevice device, InputEventPtr eventPtr)
         {
             ////REVIEW: Ideally we would defer the refresh until we repaint. That way, we would not refresh on every single
             ////        state change but rather only once for a repaint. However, for some reason, if we move the refresh
@@ -316,7 +316,7 @@ namespace UnityEngine.InputSystem.Editor
             ////       input update, there is no current EditorWindow so no window to be relative to. However, even if we read the
             ////       values in OnGUI(), the result would always be relative to the debugger window (that'd probably be fine).
 
-            if (InputState.currentUpdate != InputSystem.s_Manager.defaultUpdateType)
+            if (InputState.currentUpdateType != InputSystem.s_Manager.defaultUpdateType)
                 return;
             m_ControlTree?.RefreshControlValues();
             Repaint();

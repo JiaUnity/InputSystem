@@ -121,6 +121,9 @@ namespace UnityEngine.InputSystem.LowLevel
 
         public InputEvent* data => m_EventPtr;
 
+        // The stateFormat, stateSizeInBytes, and stateOffset properties are very
+        // useful for debugging.
+
         internal FourCC stateFormat
         {
             get
@@ -145,14 +148,26 @@ namespace UnityEngine.InputSystem.LowLevel
             }
         }
 
+        internal uint stateOffset
+        {
+            get
+            {
+                if (IsA<DeltaStateEvent>())
+                    return DeltaStateEvent.From(this)->stateOffset;
+                throw new InvalidOperationException("Event must be a DeltaStateEvent but is " + this);
+            }
+        }
+
         public bool IsA<TOtherEvent>()
             where TOtherEvent : struct, IInputEventTypeInfo
         {
             if (m_EventPtr == null)
                 return false;
 
-            var otherEventTypeCode = new TOtherEvent().typeStatic;
-            return m_EventPtr->type == otherEventTypeCode;
+            // NOTE: Important to say `default` instead of `new TOtherEvent()` here. The latter will result in a call to
+            //       `Activator.CreateInstance` on Mono and thus allocate GC memory.
+            TOtherEvent otherEvent = default;
+            return m_EventPtr->type == otherEvent.typeStatic;
         }
 
         // NOTE: It is your responsibility to know *if* there actually another event following this one in memory.

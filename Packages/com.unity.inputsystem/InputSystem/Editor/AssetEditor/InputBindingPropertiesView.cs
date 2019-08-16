@@ -154,6 +154,15 @@ namespace UnityEngine.InputSystem.Editor
             foreach (var composite in InputBindingComposite.s_Composites.internedNames.Where(x =>
                 !InputBindingComposite.s_Composites.aliases.Contains(x)).OrderBy(x => x))
             {
+                if (!string.IsNullOrEmpty(m_ExpectedControlLayout))
+                {
+                    var valueType = InputBindingComposite.GetValueType(composite);
+                    if (valueType != null &&
+                        !InputControlLayout.s_Layouts.ValueTypeIsAssignableFrom(
+                            new InternedString(m_ExpectedControlLayout), valueType))
+                        continue;
+                }
+
                 if (InputBindingComposite.s_Composites.LookupTypeRegistration(composite) == compositeType)
                     selectedCompositeIndex = currentIndex;
                 var name = ObjectNames.NicifyVariableName(composite);
@@ -287,7 +296,6 @@ namespace UnityEngine.InputSystem.Editor
         private GUIContent[] m_CompositeTypeOptions;
         private string[] m_CompositeTypes;
 
-        private readonly bool m_IsPartOfComposite;
         private int m_SelectedCompositePart;
         private GUIContent[] m_CompositePartOptions;
         private string[] m_CompositeParts;
@@ -299,7 +307,7 @@ namespace UnityEngine.InputSystem.Editor
         private readonly InputControlPickerState m_ControlPickerState;
         private readonly InputControlPathEditor m_ControlPathEditor;
 
-        private static readonly GUIContent s_CompositeTypeLabel = EditorGUIUtility.TrTextContent("Type",
+        private static readonly GUIContent s_CompositeTypeLabel = EditorGUIUtility.TrTextContent("Composite Type",
             "Type of composite. Allows changing the composite type retroactively. Doing so will modify the bindings that are part of the composite.");
         private static readonly GUIContent s_UseInControlSchemesLAbel = EditorGUIUtility.TrTextContent("Use in control scheme",
             "In which control schemes the binding is active. A binding can be used by arbitrary many control schemes. If a binding is not "

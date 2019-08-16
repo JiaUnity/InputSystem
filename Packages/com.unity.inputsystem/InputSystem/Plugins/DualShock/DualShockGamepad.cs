@@ -11,6 +11,7 @@ namespace UnityEngine.InputSystem.DualShock
     [InputControlLayout(displayName = "PS4 Controller")]
     public class DualShockGamepad : Gamepad, IDualShockHaptics
     {
+        [InputControl]
         public ButtonControl touchpadButton { get; private set; }
 
         [InputControl(name = "start", displayName = "Options")]
@@ -64,11 +65,11 @@ namespace UnityEngine.InputSystem.DualShock
                 current = null;
         }
 
-        protected override void FinishSetup(InputDeviceBuilder builder)
+        protected override void FinishSetup()
         {
-            base.FinishSetup(builder);
+            base.FinishSetup();
 
-            touchpadButton = builder.GetControl<ButtonControl>(this, "touchpadButton");
+            touchpadButton = GetChildControl<ButtonControl>("touchpadButton");
             optionsButton = startButton;
             shareButton = selectButton;
 

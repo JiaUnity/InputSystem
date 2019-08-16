@@ -94,6 +94,7 @@ namespace UnityEngine.InputSystem.Layouts
             /// This field is required.
             /// </remarks>
             /// <seealso cref="isModifyingChildControlByPath"/>
+            /// <seealso cref="InputControlAttribute.name"/>
             public InternedString name;
 
             public InternedString layout;
@@ -367,6 +368,23 @@ namespace UnityEngine.InputSystem.Layouts
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Return the type of values produced by controls created from the layout.
+        /// </summary>
+        /// <returns>The value type of the control or null if it cannot be determined.</returns>
+        /// <remarks>
+        /// This method only returns the statically inferred value type. This type corresponds
+        /// to the type argument to <see cref="InputControl{TValue}"/> in the inheritance hierarchy
+        /// of <see cref="type"/>. As the type used by the layout may not inherit from
+        /// <see cref="InputControl{TValue}"/>, this may mean that the value type cannot be inferred
+        /// and the method will return null.
+        /// </remarks>
+        /// <seealso cref="InputControl.valueType"/>
+        public Type GetValueType()
+        {
+            return TypeHelpers.GetGenericTypeArgumentFromHierarchy(type, typeof(InputControl<>), 0);
         }
 
         /// <summary>
@@ -740,6 +758,13 @@ namespace UnityEngine.InputSystem.Layouts
                 if (attributes.Length == 0)
                 {
                     if (valueType == null || !typeof(InputControl).IsAssignableFrom(valueType))
+                        continue;
+
+                    // On properties, we require explicit [InputControl] attributes to
+                    // pick them up. Doing it otherwise has proven to lead too easily to
+                    // situations where you inadvertently add new controls to a layout
+                    // just because you added an InputControl-type property to a class.
+                    if (member is PropertyInfo)
                         continue;
                 }
 
@@ -1689,6 +1714,22 @@ namespace UnityEngine.InputSystem.Layouts
                 // Try layout types.
                 layoutTypes.TryGetValue(layoutName, out var result);
                 return result;
+            }
+
+            // Return true if the given control layout has a value type whose values
+            // can be assigned to variables of type valueType.
+            public bool ValueTypeIsAssignableFrom(InternedString layoutName, Type valueType)
+            {
+                var controlType = GetControlTypeForLayout(layoutName);
+                if (controlType == null)
+                    return false;
+
+                var valueTypOfControl =
+                    TypeHelpers.GetGenericTypeArgumentFromHierarchy(controlType, typeof(InputControl<>), 0);
+                if (valueTypOfControl == null)
+                    return false;
+
+                return valueType.IsAssignableFrom(valueTypOfControl);
             }
 
             public bool IsBasedOn(InternedString parentLayout, InternedString childLayout)

@@ -354,6 +354,41 @@ partial class CoreTests
         }
     }
 
+    // Value actions perform an initial state check when enabled. These state checks are performed
+    // from InputSystem.onBeforeUpdate. However, if we enable an action as part of event processing,
+    // we will react to the state of a control right away and should then not ALSO perform an
+    // initial state check in the next update.
+    //
+    // This is relevant mainly for InputUser.onUnpairedDeviceUsed which will trigger from
+    // InputSystem.onEvent and by means of PlayerInput frequently lead to actions being disabled
+    // and enabled as part of event processing (e.g. when switching control schemes in single player).
+    [Test]
+    [Category("Actions")]
+    public void Actions_ValueActionsEnabledInOnEvent_DoNotReactToCurrentStateOfControlTwice()
+    {
+        var gamepad = InputSystem.AddDevice<Gamepad>();
+        var action = new InputAction(type: InputActionType.Value, binding: "<Gamepad>/leftStick");
+
+        InputSystem.onEvent +=
+            (eventPtr, device) => { action.Enable(); };
+
+        using (var trace = new InputActionTrace(action))
+        {
+            Set(gamepad.leftStick, new Vector2(0.234f, 0.345f));
+
+            Assert.That(trace,
+                Started(action, control: gamepad.leftStick)
+                    .AndThen(Performed(action, control: gamepad.leftStick)));
+
+            trace.Clear();
+
+            // This one should not trigger anything on the action.
+            InputSystem.Update();
+
+            Assert.That(trace, Is.Empty);
+        }
+    }
+
     [Test]
     [Category("Actions")]
     public void Actions_CanBeDisabledInCallback()
@@ -5935,13 +5970,13 @@ partial class CoreTests
         var touch0Action = new InputAction("Touch0", binding: "<Touchscreen>/touch0/position");
         var touch1Action = new InputAction("Touch1", binding: "<Touchscreen>/touch1/position");
         var positionAction = new InputAction("Position", binding: "<Touchscreen>/position");
-        var tapAction = new InputAction("Tap", binding: "<Touchscreen>/tap");
+        var tapAction = new InputAction("Tap", binding: "<Touchscreen>/primaryTouch/tap");
 
         Assert.That(primaryTouchAction.controls, Is.EquivalentTo(new[] { touchscreen.primaryTouch.position }));
         Assert.That(touch0Action.controls, Is.EquivalentTo(new[] { touchscreen.touches[0].position }));
         Assert.That(touch1Action.controls, Is.EquivalentTo(new[] { touchscreen.touches[1].position }));
         Assert.That(positionAction.controls, Is.EquivalentTo(new[] { touchscreen.position }));
-        Assert.That(tapAction.controls, Is.EquivalentTo(new[] { touchscreen.tap }));
+        Assert.That(tapAction.controls, Is.EquivalentTo(new[] { touchscreen.primaryTouch.tap }));
 
         primaryTouchAction.Enable();
         touch0Action.Enable();
@@ -6099,9 +6134,9 @@ partial class CoreTests
                 Started(pressAction, touchscreen.press, 1, 0.5)
                     .AndThen(Performed(pressAction, touchscreen.press, 1, 0.5))
                     .AndThen(Canceled(pressAction, touchscreen.press, 0, 0.5))
-                    .AndThen(Started(primaryAction, touchscreen.tap, 1, 0.5))
-                    .AndThen(Performed(primaryAction, touchscreen.tap, 1, 0.5))
-                    .AndThen(Canceled(primaryAction, touchscreen.tap, 0, 0.5)));
+                    .AndThen(Started(primaryAction, touchscreen.primaryTouch.tap, 1, 0.5))
+                    .AndThen(Performed(primaryAction, touchscreen.primaryTouch.tap, 1, 0.5))
+                    .AndThen(Canceled(primaryAction, touchscreen.primaryTouch.tap, 0, 0.5)));
 
             trace.Clear();
 
